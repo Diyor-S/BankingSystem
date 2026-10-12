@@ -1,4 +1,5 @@
 class Cli:
+    name = "cli"
     commands: None
 
     def startup(self) -> None:
