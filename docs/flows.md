@@ -57,7 +57,7 @@ sequenceDiagram
     API->>API: validate (cards active, amount > 0, balance enough)
     API->>SMS: OTP to customer's phone
     C->>API: OTP + idempotency key
-    API->>DB: BEGIN&#59; lock both cards&#59; debit&#59; credit&#59; insert transaction&#59; COMMIT
+    API->>DB: BEGIN, lock both cards, debit, credit, insert transaction, COMMIT
     DB-->>API: transaction TX-000123
     API->>SMS: notification to sender and recipient
     API-->>C: receipt (reference, amount)
