@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from domain.bank import Bank
 from ui.base import UIProto
-from ui.cli import Cli
+from config.constants import UI_IMPL
 
 
 class App:
     def __init__(self, bank: Bank | None = None, ui: UIProto | None = None) -> None:
         self._bank = bank or Bank()
-        self._ui = ui or Cli()
+        self._ui = ui or UI_IMPL.get("cli")
 
     @property
     def bank(self) -> Bank:
