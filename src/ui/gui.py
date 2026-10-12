@@ -1,4 +1,6 @@
 class Gui:
+    name = "gui"
+
     def startup(self) -> None:
         pass
 

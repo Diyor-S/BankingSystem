@@ -16,8 +16,28 @@ class UIProto(Protocol):
     Example: 'commands' attribute, not all user interfaces might have this attribute.
     Enforcing this attribute in this Protocol makes the ones that do not have incompatible with this type.
     """
+    name: str
     commands: None
 
     def startup(self) -> None: ...
     def run(self) -> None: ...
     def shutdown(self) -> None: ...
+
+
+class UIHandler:
+    def __init__(self, interface: UIProto) -> None:
+        """
+        The main User Interface Class.
+
+        Might be Web-Based, Desktop-Based, or Console-Based.
+
+        :param interface: implementation of User Interface.
+        """
+
+        self._impl = interface
+
+    def run(self) -> None:
+        self._impl.run()
+
+    def shutdown(self) -> None:
+        self._impl.shutdown()
