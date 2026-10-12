@@ -38,15 +38,15 @@ class App:
         """
         return self.ui.commands if self.commands_supported(self.ui) else None
 
-    @staticmethod
-    def are_commands_supported(ui: UIProto) -> bool:
+    @property
+    def are_commands_supported(self) -> bool:
         """
         Are commands supported for this User Interface?
 
         :param ui: current User Interface.
         :return: True if we get from 'ui' attribute 'commands' to be other than 'None' else False.
         """
-        commands = getattr(ui, "commands", None)
+        commands = getattr(self.ui, "commands", None)
         return commands is not None
 
     def run(self) -> None:
