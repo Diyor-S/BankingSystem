@@ -1,0 +1,38 @@
+TRELLO BOARD 'SmartBank SB-2026' - HOW TO CREATE IT IN ~5 MINUTES
+1. Trello -> Create board -> name: SmartBank SB-2026 -> delete default lists.
+2. Create 5 lists in this order: Backlog | To Do (Sprint 1) | In Progress | Testing | Done
+3. In a list click 'Add a card', paste ALL lines of the matching block below at once -> Trello offers to create one card per line -> confirm.
+4. Optional: add labels (User Story / Design / Dev / QA) and paste the acceptance criteria from docs/backlog-and-tasks.md into card descriptions.
+5. Board menu -> Visibility -> Public. Copy the board URL into the report (list of working links, row 2).
+
+===== LIST: Backlog =====
+US-02 Register by passport ID (Must, 5)
+US-03 Log in with phone + OTP (Must, 3)
+US-04 Link a card (Must, 5)
+US-05 View cards and balances (Must, 3)
+US-06 Transaction history (Should, 3)
+US-07 SMS notification for each transaction (Must, 3)
+US-08 Admin: view users, cards, transactions (Must, 5)
+US-09 Admin: freeze / unfreeze account (Should, 3)
+US-10 Unlink a card (Could, 2)
+US-11 Pay bills online (Won't, 13)
+T-01 [Design] Draw transfer user flow in draw.io (8+ steps, 3 error branches) - 3 h
+T-03 [Design] ER diagram: 6 tables with keys and constraints - 3 h
+T-06 [Dev] OTP confirmation of transfer (6 digits, 3 min, 3 attempts) - 6 h
+T-07 [QA] 15 manual test cases for transfers - 5 h
+T-08 [QA] Automated test: 50 parallel transfers (10 succeed, 40 rejected) - 3 h
+
+===== LIST: To Do Sprint 1 =====
+US-01 Card-to-card transfer (Must, 8)
+T-02 [Design] Wireframes of 3 transfer screens - 6 h
+T-04 [Dev] Transfer API: POST /api/transfers + GET /api/cards, atomic, idempotent - 12 h
+T-05 [Dev] React page 'Transfer money' connected to the API - 10 h
+
+===== LIST: In Progress =====
+(leave empty on Day 1)
+
+===== LIST: Testing =====
+(leave empty on Day 1)
+
+===== LIST: Done =====
+(leave empty on Day 1)

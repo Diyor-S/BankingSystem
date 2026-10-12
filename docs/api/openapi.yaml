@@ -1,0 +1,302 @@
+openapi: 3.0.3
+info:
+  title: SmartBank API (SB-2026)
+  version: 0.1.0
+  description: |
+    REST API of the SmartBank prototype. External systems (Passport Registry, Card Registry, SMS gateway)
+    are imitated by mock endpoints under /mock. In Sprint 1 only /api/cards and /api/transfers (without OTP) are built.
+servers:
+  - url: http://localhost:8000
+tags:
+  - name: auth
+  - name: cards
+  - name: transfers
+  - name: admin
+  - name: mock
+paths:
+  /api/auth/register/start:
+    post:
+      tags: [auth]
+      summary: Start registration by passport ID (US-02, FR-01, FR-02)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [passport_id]
+              properties:
+                passport_id: { type: string, example: AA1000006, pattern: '^[A-Z]{2}[0-9]{7}$' }
+      responses:
+        '200': { description: OTP sent to the phone from the registry (masked phone returned), content: { application/json: { schema: { $ref: '#/components/schemas/OtpSent' } } } }
+        '404': { description: Passport not found in the registry }
+        '409': { description: Passport already has an account }
+  /api/auth/register/verify:
+    post:
+      tags: [auth]
+      summary: Confirm the OTP and create the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [passport_id, otp]
+              properties:
+                passport_id: { type: string }
+                otp: { type: string, example: '123456' }
+      responses:
+        '201': { description: Account created; session token returned }
+        '400': { description: Wrong or expired code }
+        '429': { description: Too many attempts (max 3) }
+  /api/auth/login/start:
+    post:
+      tags: [auth]
+      summary: Start login by phone number (US-03, FR-03)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone: { type: string, example: '+998901234567' }
+      responses:
+        '200': { description: OTP sent }
+        '404': { description: Unknown phone }
+  /api/auth/login/verify:
+    post:
+      tags: [auth]
+      summary: Confirm the OTP and get a session token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, otp]
+              properties:
+                phone: { type: string }
+                otp: { type: string }
+      responses:
+        '200': { description: Session token }
+        '400': { description: Wrong or expired code }
+        '429': { description: Too many attempts }
+  /api/cards:
+    get:
+      tags: [cards]
+      summary: Linked cards and balances of the logged-in customer (US-05, FR-05)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: List of cards (numbers masked)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Card' }
+  /api/cards/link/start:
+    post:
+      tags: [cards]
+      summary: Check the card and send an OTP (US-04, FR-04)
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [card_number]
+              properties:
+                card_number: { type: string, example: '7000000000000011' }
+      responses:
+        '200': { description: Checks passed, OTP sent }
+        '404': { description: Card not found }
+        '409': { description: Card already linked to another customer }
+        '422': { description: Card is blocked or its attached phone differs from the customer's phone }
+  /api/cards/link/confirm:
+    post:
+      tags: [cards]
+      summary: Confirm linking with the OTP
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [card_number, otp]
+              properties:
+                card_number: { type: string }
+                otp: { type: string }
+      responses:
+        '200': { description: Card linked }
+        '400': { description: Wrong or expired code }
+  /api/transfers/otp:
+    post:
+      tags: [transfers]
+      summary: Request the OTP for a transfer (added in Sprint 2, task T-06)
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [from_card, to_card, amount]
+              properties:
+                from_card: { type: string }
+                to_card: { type: string }
+                amount: { type: number, example: 100000 }
+      responses:
+        '200': { description: OTP sent }
+  /api/transfers:
+    post:
+      tags: [transfers]
+      summary: Card-to-card transfer (US-01, FR-06, FR-07, FR-08) – the core of Sprint 1 (task T-04)
+      description: |
+        Debit and credit are written in one DB transaction (see docs/database/transfer_function.sql).
+        A repeated request with the same idempotency_key returns the original result.
+        `otp` is optional in Sprint 1 and required from Sprint 2.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [from_card, to_card, amount, idempotency_key]
+              properties:
+                from_card: { type: string, example: '7000000000000001' }
+                to_card: { type: string, example: '7000000000000031' }
+                amount: { type: number, example: 100000 }
+                idempotency_key: { type: string, example: 'b1e2c3d4-0001' }
+                otp: { type: string, example: '123456' }
+      responses:
+        '201': { description: Transfer completed, content: { application/json: { schema: { $ref: '#/components/schemas/Transfer' } } } }
+        '200': { description: Duplicate idempotency key – original result returned }
+        '400': { description: Invalid amount, same card, or wrong OTP }
+        '404': { description: Sender or recipient card not found }
+        '422': { description: Insufficient funds }
+        '423': { description: Card blocked or account frozen }
+  /api/transactions:
+    get:
+      tags: [transfers]
+      summary: Transaction history of the logged-in customer (US-06, FR-09)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: query, name: from, schema: { type: string, format: date } }
+        - { in: query, name: to, schema: { type: string, format: date } }
+      responses:
+        '200':
+          description: Transactions, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Transfer' }
+  /api/admin/users:
+    get:
+      tags: [admin]
+      summary: Search users by passport ID, phone or card (US-08, FR-11); every view is audited
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: query, name: q, schema: { type: string } }
+      responses:
+        '200': { description: Users }
+        '403': { description: Not an admin }
+  /api/admin/users/{id}:
+    get:
+      tags: [admin]
+      summary: User details with cards and transactions
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: User }
+        '403': { description: Not an admin }
+  /api/admin/users/{id}/freeze:
+    post:
+      tags: [admin]
+      summary: Freeze the account (US-09, FR-12); unfreeze with DELETE
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        '204': { description: Frozen }
+    delete:
+      tags: [admin]
+      summary: Unfreeze the account
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        '204': { description: Unfrozen }
+  /mock/passports/{passport_id}:
+    get:
+      tags: [mock]
+      summary: Mock Passport Registry lookup
+      parameters:
+        - { in: path, name: passport_id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Passport record
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passport_id: { type: string }
+                  full_name: { type: string }
+                  birth_date: { type: string, format: date }
+                  phone: { type: string }
+        '404': { description: Not found }
+  /mock/sms:
+    get:
+      tags: [mock]
+      summary: Developer inbox of the mock SMS gateway (OTP codes are read here)
+      responses:
+        '200': { description: Messages, newest first }
+    post:
+      tags: [mock]
+      summary: "Mock SMS gateway: 'send' a message (stored in mock.sms_messages)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, body]
+              properties:
+                phone: { type: string }
+                body: { type: string }
+                purpose: { type: string }
+      responses:
+        '202': { description: Accepted }
+        '503': { description: Gateway switched off (failure test) }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }
+  schemas:
+    OtpSent:
+      type: object
+      properties:
+        masked_phone: { type: string, example: '+998 ** *** ** 45' }
+        expires_in_seconds: { type: integer, example: 180 }
+    Card:
+      type: object
+      properties:
+        card_number_masked: { type: string, example: '•••• 4821' }
+        balance: { type: number }
+        currency: { type: string, example: UZS }
+        status: { type: string, enum: [active, blocked] }
+    Transfer:
+      type: object
+      properties:
+        reference: { type: string, example: TX-000123 }
+        from_card_masked: { type: string }
+        to_card_masked: { type: string }
+        amount: { type: number }
+        status: { type: string, enum: [completed, failed] }
+        created_at: { type: string, format: date-time }

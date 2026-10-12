@@ -1,0 +1,44 @@
+@startuml
+title SmartBank: Use Case diagram
+left to right direction
+actor Customer
+actor Admin
+actor "Passport Registry\n(mock)" as PR
+actor "Card Registry\n(mock)" as CR
+actor "SMS gateway\n(mock)" as SMS
+
+rectangle SmartBank {
+  usecase "UC-01 Register by passport ID" as UC1
+  usecase "UC-02 Log in with OTP" as UC2
+  usecase "UC-03 Link card" as UC3
+  usecase "UC-04 Transfer money\n(card to card)" as UC4
+  usecase "UC-05 View cards and balances" as UC5
+  usecase "UC-06 View transaction history" as UC6
+  usecase "UC-07 Verify passport in registry (mock)" as UC7
+  usecase "UC-08 Check passport-phone-card match" as UC8
+  usecase "UC-09 Confirm operation by OTP" as UC9
+  usecase "UC-10 Send notification (SMS)" as UC10
+  usecase "UC-11 View users, cards and transactions" as UC11
+  usecase "UC-12 Freeze / unfreeze account" as UC12
+}
+
+Customer --> UC1
+Customer --> UC2
+Customer --> UC3
+Customer --> UC4
+Customer --> UC5
+Customer --> UC6
+Admin --> UC11
+Admin --> UC12
+PR --> UC7
+CR --> UC8
+SMS --> UC9
+SMS --> UC10
+
+UC1 .> UC7 : <<include>>
+UC3 .> UC8 : <<include>>
+UC3 .> UC9 : <<include>>
+UC4 .> UC9 : <<include>>
+UC4 .> UC10 : <<include>>
+UC12 .> UC11 : <<extend>>
+@enduml
