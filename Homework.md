@@ -73,3 +73,23 @@ Meaning App would store that as its instance level attribute the UI class,
 
 So I might have base class implementations for all three of the different UIs.
 And then if anyones would want to extend that further they would need to inherit.
+
+
+Okay let's stop for a little bit. 
+
+What is the core of the Banking System?
+
+What is its core things without which the Banking System would not be able to exist?
+
+In the very low-level, there is contracts on how to pass the data. 
+
+These should be the rules on how the data travels.
+Maybe the JSON, Encoding, Decoding,
+Validators - validatings the values,
+Exceptions to raise when the values are not of the appropriate type. 
+
+Defining the contracts the rules, the types.
+Defining the handlers on the low-level generic interfaces that do not depend on domain-specific entities.
+
+
+
