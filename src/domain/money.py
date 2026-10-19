@@ -15,8 +15,8 @@ class Currency:
         if not isinstance(code, Code):
             raise TypeError(f"Code must be of type {Code!r}, but got {type(code)!r} instead.")
 
-        if not isinstance(exponent, int):
-            raise TypeError(f"Exponent should be of type 'int', but got {type(exponent)} instead")
+        if isinstance(exponent, bool) or not isinstance(exponent, int):
+            raise TypeError(f"Exponent should be of type 'int', but got {type(exponent)!r} instead")
 
         if exponent < 0:
             raise ValueError("Exponent must be non-negative.")
@@ -55,16 +55,11 @@ class Money:
         if not isinstance(currency, Currency):
             raise TypeError(f"Expected type 'Currency', but got {currency}")
 
-        if not isinstance(amount, int):
+        if isinstance(amount, bool) or not isinstance(amount, int):
             raise TypeError("Amount is of wrong type, should be of type 'int'")
-
-        if amount < 0:
-            raise ValueError("Amount should be negative!")
-
 
         self.amount = amount
         self.currency = currency
-
 
     @classmethod
     def uzs(cls, amount: int) -> Self:
