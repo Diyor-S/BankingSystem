@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Protocol
+from typing import runtime_checkable, Protocol
 
+@runtime_checkable
 class UIProto(Protocol):
     """
     User Interface Protocol.
@@ -35,6 +36,10 @@ class UIHandler:
         """
 
         self._impl = interface
+
+    def startup(self):
+        print("This is the UIHandler startup, it merely invokes the given interface's startup method.")
+        self._impl.startup()
 
     def run(self) -> None:
         self._impl.run()

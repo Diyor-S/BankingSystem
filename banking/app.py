@@ -1,14 +1,28 @@
 from __future__ import annotations
 
 from domain.bank import Bank
-from ui.base import UIProto
+from ui.base import UIProto, UIHandler
 from config.constants import UI_IMPL
 
 
+class UserInterfaceNotSupported(Exception):
+    pass
+
 class App:
     def __init__(self, bank: Bank | None = None, ui: UIProto | None = None) -> None:
-        self._bank = bank or Bank()
-        self._ui = ui or UI_IMPL.get("cli")
+        self._bank = bank or Bank("SmartBank", "Tashkent")
+
+        if ui is not None:
+            if not isinstance(ui, UIProto):
+                raise TypeError("Invalid UI interface received. It should satisfy the UIProto interface!")
+
+            if ui.name not in UI_IMPL:
+                raise UserInterfaceNotSupported("Implementation for this User Interface not supported")
+        else:
+            ui = UI_IMPL.get("cli")()
+
+
+        self._ui = UIHandler(ui)
 
     @property
     def bank(self) -> Bank:
@@ -36,7 +50,7 @@ class App:
 
         :return: reference to Commands instance.
         """
-        return self.ui.commands if self.commands_supported(self.ui) else None
+        return self.ui.commands if self.are_commands_supported else None
 
     @property
     def are_commands_supported(self) -> bool:
@@ -52,9 +66,11 @@ class App:
     def run(self) -> None:
         """
         Main Application Loop.
-        Performs all the required preparations and clean-up.
+        Performs all the required preparations and cleanup.
 
         :return: None
         """
         print("App is running...")
+
+        self.ui.startup()
 
