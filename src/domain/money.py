@@ -16,6 +16,10 @@ class Currency:
         if not isinstance(code, Code):
             raise TypeError(f"Code must be of type {Code!r}, but got {type(code)!r} instead.")
 
+        if hasattr(code, "__len__"):
+            if len(code) < 1:
+                raise ValueError("Currency code must be at least of length: 1")
+
         if isinstance(exponent, bool) or not isinstance(exponent, int):
             raise TypeError(f"Exponent should be of type 'int', but got {type(exponent)!r} instead")
 
