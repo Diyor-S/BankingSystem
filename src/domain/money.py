@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import total_ordering
 from typing import TypeAlias, Self
 
 Code: TypeAlias = str
@@ -50,6 +51,7 @@ def get_currency(code: Code) -> Currency:
 
 class IncompatibleCurrencies(Exception): ...
 
+@total_ordering
 class Money:
     def __init__(self, currency: Currency, amount: int) -> None:
         if not isinstance(currency, Currency):
@@ -58,8 +60,19 @@ class Money:
         if isinstance(amount, bool) or not isinstance(amount, int):
             raise TypeError("Amount is of wrong type, should be of type 'int'")
 
-        self.amount = amount
-        self.currency = currency
+        if amount < 0:
+            raise ValueError("Amount should not be negative.")
+
+        self._amount = amount
+        self._currency = currency
+
+    @property
+    def amount(self) -> int:
+        return self._amount
+
+    @property
+    def currency(self) -> Currency:
+        return self._currency
 
     @classmethod
     def uzs(cls, amount: int) -> Self:
@@ -70,22 +83,22 @@ class Money:
         return cls(get_currency("USD"), amount)
 
     def _require_same_currency(self, other: Money) -> None:
-        if self.currency.code != other.currency.code:
+        if self._currency != other._currency:
             raise IncompatibleCurrencies(
                 f"Currencies should be of the same type!\n"
-                f"Currency: {self.currency.code} is not compatible with {other.currency.code}"
+                f"Currency: {self._currency.code} is not compatible with {other._currency.code}"
             )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Money):
             return NotImplemented
-        return (self.currency, self.amount) == (other.currency, other.amount)
+        return (self._currency, self._amount) == (other._currency, other._amount)
 
     def __hash__(self) -> int:
-        return hash((self.currency, self.amount))
+        return hash((self._currency, self._amount))
 
     def __repr__(self) -> str:
-        return f"Money({self.currency.code}, {self.amount})"
+        return f"Money({self._currency.code}, {self._amount})"
 
     # Number-like operations
 
@@ -94,12 +107,21 @@ class Money:
             return NotImplemented
 
         self._require_same_currency(other)
-        return Money(self.currency, self.amount + other.amount)
+        return Money(self._currency, self._amount + other._amount)
 
     def __sub__(self, other: object) -> Money:
         if not isinstance(other, Money):
             return NotImplemented
 
         self._require_same_currency(other)
-        return Money(self.currency, self.amount - other.amount)
 
+        if self._amount < other._amount:
+            raise ValueError("The amount would result in corrupted 'negative' state")
+        return Money(self._currency, self._amount - other._amount)
+
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, Money):
+            return NotImplemented
+
+        self._require_same_currency(other)
+        return self._amount < other._amount
