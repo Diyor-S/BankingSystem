@@ -54,6 +54,5 @@ class BasePassport:
                 raise ValueError(f"At least 1 character should be present! But got {len(field)}")
 
 
-
-
-
+class UZBPassport(BasePassport):
+    pass
