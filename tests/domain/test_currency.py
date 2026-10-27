@@ -46,5 +46,7 @@ class TestCurrency:
         with pytest.raises(TypeError):
             Currency(*args)
 
-
-
+    def test_eq(self):
+        assert Currency("UZS", 2) == Currency("UZS", 2)
+        assert Currency("UZS", 2) != Currency("USD", 2)
+        assert Currency("UZS", 2) != Currency("UZS", 1)
