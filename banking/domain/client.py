@@ -39,7 +39,7 @@ class Person:
     def __repr__(self) -> str:
         return f"{type(self).__name__}(full_name={self.full_name}, id={self.identity})"
 
-class Client:
+class Client(Person):
     """
     Client - core entity of the Banking System.
 
@@ -48,11 +48,18 @@ class Client:
 
     """
 
-    def __init__(self, name: str, email: str, password: str) -> None:
+    def __init__(self, first_name: str, last_name: str, email: str, password: str, passport: BasePassport) -> None:
         """
 
-
-        :param name:
+        :param first_name:
+        :param last_name:
         :param email:
         :param password:
+        :param passport:
         """
+
+        super().__init__(first_name, last_name, passport)
+
+        # These fields are likely gonna be changed.
+        self.email = email
+        self.password = password
