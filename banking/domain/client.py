@@ -22,7 +22,19 @@ class Person:
 
     @property
     def identity(self) -> str:
-        return self._identity
+        return self._passport.identity
+
+    @property
+    def birth(self) -> date:
+        return self._passport.birth_date
+
+    @property
+    def age(self) -> int:
+        return self._passport.calculate_age()
+
+    @property
+    def is_passport_expired(self) -> bool:
+        return self._passport.is_expired
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}(full_name={self.full_name}, id={self.identity})"
