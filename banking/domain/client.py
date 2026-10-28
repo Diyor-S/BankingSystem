@@ -1,3 +1,6 @@
+from datetime import date
+from banking.domain.passport import BasePassport
+
 class Person:
     """
     Person - base class for defining a Person.
@@ -7,10 +10,11 @@ class Person:
     Inherits: None.
     """
 
-    def __init__(self, first_name: str, last_name: str, identity: str) -> None:
+    def __init__(self, first_name: str, last_name: str, passport: BasePassport) -> None:
         self.first_name = first_name
         self.last_name = last_name
-        self._identity = identity
+
+        self._passport = passport
 
     @property
     def full_name(self) -> str:
