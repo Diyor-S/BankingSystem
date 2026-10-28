@@ -46,6 +46,8 @@ class InMemoryStorage(Storage[EntityID, EntityT]):
     def all(self) -> Sequence[EntityT]:
         return list(self._items.values())
 
+    def get(self, item_id: EntityT) -> EntityT | None:
+        return self._items.get(item_id, None)
 
 class FileStorage(Storage[EntityID, EntityT]):
     def __init__(self, file_path: str) -> None:
