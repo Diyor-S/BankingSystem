@@ -10,11 +10,16 @@ class Person:
     Inherits: None.
     """
 
-    def __init__(self, first_name: str, last_name: str, passport: BasePassport) -> None:
-        self.first_name = first_name
-        self.last_name = last_name
-
+    def __init__(self, passport: BasePassport) -> None:
         self._passport = passport
+
+    @property
+    def first_name(self) -> str:
+        return self._passport.first_name
+
+    @property
+    def last_name(self) -> str:
+        return self._passport.last_name
 
     @property
     def full_name(self) -> str:
@@ -48,17 +53,15 @@ class Client(Person):
 
     """
 
-    def __init__(self, first_name: str, last_name: str, email: str, password: str, passport: BasePassport) -> None:
+    def __init__(self, email: str, password: str, passport: BasePassport) -> None:
         """
-
-        :param first_name:
-        :param last_name:
+        :param passport:
         :param email:
         :param password:
-        :param passport:
+
         """
 
-        super().__init__(first_name, last_name, passport)
+        super().__init__(passport)
 
         # These fields are likely gonna be changed.
         self.email = email
