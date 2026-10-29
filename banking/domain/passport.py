@@ -44,6 +44,14 @@ class BasePassport:
     def is_expired(self) -> bool:
         return self.expires_at < date.today()
 
+    def calculate_age(self) -> int:
+        today = date.today()
+
+        has_birthday_passed = (today.month, today.day) >= (self.birth_date.month, self.birth_date.day)
+
+        return today.year - self.birth_date.year - (0 if has_birthday_passed else 1)
+
+
     @staticmethod
     def _check_str_names(fields: Sequence[str]) -> None:
         for field in fields:
