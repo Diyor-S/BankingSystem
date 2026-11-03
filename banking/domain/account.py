@@ -42,3 +42,6 @@ class BaseAccount:
             raise NotEnoughMoneyInBalance("Not enough money in balance")
 
         self._balance -= balance_to_withdraw
+
+class UZBAccount(BaseAccount):
+    pass

@@ -5,26 +5,26 @@ Main Entrypoint - Banking System.
 from __future__ import annotations
 
 import time
-from typing import Protocol, Any
+from typing import Any, Protocol
 
-from client import Client, ClientSet
-from account import UZBAccount, AccountSet
-from command import Command, CommandSet, STANDARD_COMMANDS
-from passport import UZBPassport, PassportSet
-
+from account import AccountSet, UZBAccount
 from cli import (
-    startup_ui,
+    eq_separator,
+    identify_user,
+    linear_separator,
+    pre_computed,
     show_commands,
     shutdown_ui,
-    eq_separator,
-    linear_separator,
-
-    pre_computed,
-    identify_user,
+    startup_ui,
 )
+from client import Client, ClientSet
+from command import STANDARD_COMMANDS, Command, CommandSet
+from passport import PassportSet, UZBPassport
+
 
 class OnStartupHandler(Protocol):
     def __call__(self, *args: Any, **kwargs: Any) -> None: ...
+
 
 class OnExitHandler(Protocol):
     def __call__(self, *args: Any, **kwargs: Any) -> None: ...
@@ -36,7 +36,7 @@ class BankingSystem:
     def __init__(
         self,
         on_startup: OnStartupHandler | None = None,
-        on_exit: OnExitHandler | None = None
+        on_exit: OnExitHandler | None = None,
     ):
         self._clients = ClientSet()
         self._accounts = AccountSet()
@@ -116,7 +116,9 @@ class BankingSystem:
                             argument = arg.parse(raw)
                             arguments.append(argument)
                         except ValueError:
-                            print(f"Invalid argument for {arg.name!r}, need value compatible with type {arg.type!r}")
+                            print(
+                                f"Invalid argument for {arg.name!r}, need value compatible with type {arg.type!r}"
+                            )
 
                     try:
                         command.execute(*arguments)
@@ -130,11 +132,9 @@ class BankingSystem:
                 else:
                     command.execute()
 
-
         except KeyboardInterrupt:
             print("\n")
             shutdown_ui()
-
 
     def startup(self) -> tuple[Client, UZBAccount, UZBPassport]:
         print("Let's find out who you are!")
@@ -155,9 +155,9 @@ class BankingSystem:
 
         return client, account, passport
 
-
     def exit(self) -> None:
         pass
+
 
 def client_details(client: Client) -> None:
     print("Client")
@@ -173,6 +173,7 @@ def client_details(client: Client) -> None:
     print(f"ID: {account.id_}")
     print(f"Type: {account.__class__.__name__}")
     print(f"Balance: {account.balance}")
+
 
 if __name__ == "__main__":
     bank = BankingSystem()

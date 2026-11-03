@@ -53,6 +53,9 @@ class FileStorage(Storage[EntityID, EntityT]):
     def __init__(self, file_path: str) -> None:
         self.file_path = file_path
 
+    def _load(self) -> None:
+        pass
+
     def add(self, item: EntityT) -> None:
         pass
 
