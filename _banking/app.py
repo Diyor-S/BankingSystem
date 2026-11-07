@@ -6,10 +6,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from config import get_settings
+from _banking.config import get_settings
 
 if TYPE_CHECKING:
-    from config import Settings
+    from _banking.config import Settings
 
 
 class App:
