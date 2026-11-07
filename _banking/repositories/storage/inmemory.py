@@ -1,22 +1,19 @@
 from __future__ import annotations
 
 import copy
-import enum
 import itertools
-from typing import Any, TypeVar
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
-from .base import EntityID, EntityT, EntityClassT
 from .base import Storage
 
-class EntityNotFound(Exception):
-    pass
+if TYPE_CHECKING:
+    from typing import Any, TypeAlias
+    from collections.abc import Sequence
 
-class SelectionMode(enum.Enum):
-    LAST = -1
-    FIRST = 0
+    from .base import EntityID, EntityT, EntityClassT
+    from .base import EntityNotFound, SelectionMode
 
-StorageT = TypeVar("StorageT", bound=Any)
+    InMemoryStorageT: TypeAlias = dict[EntityID, EntityT]
 
 class InMemoryStorage(Storage[EntityClassT]):
     def __init__(self, entity_cls: EntityClassT) -> None:
@@ -25,7 +22,7 @@ class InMemoryStorage(Storage[EntityClassT]):
         self._storage: dict[EntityID, EntityT] = {}                       # noqa
 
     @property
-    def storage(self) -> StorageT:
+    def storage(self) -> InMemoryStorageT:
         return self._storage
 
     def _get_entity(self, entity_id: EntityID) -> EntityT:
@@ -61,7 +58,12 @@ class InMemoryStorage(Storage[EntityClassT]):
     def get(self, entity_id: EntityID) -> EntityT:
         return copy.deepcopy(self._get_entity(entity_id))
 
-    def get_many(self, number: int, which: SelectionMode = SelectionMode.FIRST, sorting_condition=None) -> Sequence[EntityT]:
+    def get_many(
+        self,
+        number: int,
+        order_by: tuple[str, ...] = (),
+        which: SelectionMode = SelectionMode.FIRST
+    ) -> Sequence[EntityT]:
         iterable_ = self.storage.values()
 
         if which is SelectionMode.LAST:
