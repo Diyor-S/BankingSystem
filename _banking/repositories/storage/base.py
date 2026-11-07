@@ -1,3 +1,4 @@
+import enum
 from collections.abc import Sequence
 from typing import Any, Protocol, TypeVar, Generic, TypeAlias, Union
 
@@ -22,8 +23,14 @@ class EntityProto(Protocol):
 EntityClassT = TypeVar("EntityClassT", bound=type)
 EntityT = TypeVar("EntityT", bound=EntityProto)
 
+class EntityNotFound(Exception):
+    pass
 
-class Storage(Generic[EntityClassT]):
+class SelectionMode(enum.Enum):
+    LAST = -1
+    FIRST = 0
+
+class Storage(Generic[EntityT]):
     storage: Any
 
     def __init__(self, entity_cls: EntityClassT) -> None:
@@ -41,9 +48,16 @@ class Storage(Generic[EntityClassT]):
     def get(self, *args, **kwargs) -> EntityT:
         raise NotImplementedError
 
-    def get_many(self, number: int) -> Sequence[EntityT]:
+    def get_many(
+        self,
+        number: int,
+        order_by: tuple[str, ...] = (),
+        which: SelectionMode = SelectionMode.FIRST,
+    ) -> Sequence[EntityT]:
         raise NotImplementedError
 
     def get_all(self) -> Any:
         raise NotImplementedError
 
+
+StorageT = TypeVar("StorageT", bound=Storage)
