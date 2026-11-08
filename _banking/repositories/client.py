@@ -26,8 +26,8 @@ class ClientRepository:
     Client Repository, internal operations perform with client.
     """
 
-    def __init__(self, storage: Storage) -> None:
-        self.clients: Storage[Client] = storage or InMemoryStorage(Client)
+    def __init__(self, storage: Storage[Client] | None = None) -> None:
+        self.clients: Storage[Client] = storage or InMemoryStorage[Client](Client)
 
     def create(self, **kwargs: Any) -> Client:
         return self.clients.create(**kwargs)
