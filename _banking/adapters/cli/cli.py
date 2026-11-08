@@ -32,7 +32,12 @@ class Cli:
 
         try:
             while True:
-                message = input("Enter your message: ")
+                message = input("Enter your command: ")
+
+                if message == "1":
+                    client = self.app.create_client()
+
+                    print("Welcome client: %r" % client.name)
 
                 print("Your message: %r" % message)
         except KeyboardInterrupt:
