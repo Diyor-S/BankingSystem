@@ -5,17 +5,16 @@ import itertools
 from typing import TYPE_CHECKING
 
 from .base import Storage
+from .base import EntityID, EntityT, EntityClassT
+from .base import EntityNotFound, SelectionMode
 
 if TYPE_CHECKING:
     from typing import Any, TypeAlias
     from collections.abc import Sequence
 
-    from .base import EntityID, EntityT, EntityClassT
-    from .base import EntityNotFound, SelectionMode
-
     InMemoryStorageT: TypeAlias = dict[EntityID, EntityT]
 
-class InMemoryStorage(Storage[EntityClassT]):
+class InMemoryStorage(Storage[EntityT]):
     def __init__(self, entity_cls: EntityClassT) -> None:
         super().__init__(entity_cls)
 
