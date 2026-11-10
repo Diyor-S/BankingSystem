@@ -2,19 +2,29 @@
 Application Configuration.
 """
 
+from typing import Literal
 from functools import cache
 
-_UIs: dict[str, str] = {
-    "cli": "cli",
-    "web": "web",
-}
 
-class UserInterfaceConfig:
-    type: str = _UIs["cli"]
+class ApplicationConfig:
+    backend: Literal[
+        "cli",
+        "web",
+        "gui"
+    ]
+
+class StorageConfig:
+    backend = Literal[
+        "inmemory",
+        "file",
+        "database"
+    ]
+
 
 class Settings:
     def __init__(self):
-        self.interface = UserInterfaceConfig()
+        self.app = ApplicationConfig()
+        self.storage = StorageConfig()
 
 
 @cache
