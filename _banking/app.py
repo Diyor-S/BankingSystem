@@ -7,10 +7,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from _banking.config import get_settings
+from _banking.factory import get_factory
 from _banking.services import ClientService
 
 if TYPE_CHECKING:
     from _banking.config import Settings
+    from _banking.factory import Factory
 
 
 class App:
@@ -28,23 +30,21 @@ class App:
         # TODO: Remove this attribute to another class, e.g: BankingService
         self.client_service = client_service or ClientService()
 
-        # self._interface = get_interface()
+        self._factory = get_factory()
 
     @property
     def settings(self) -> Settings:
         return self._settings
 
     @property
-    def interface(self):
-        return self.settings.interface
+    def factory(self) -> Factory:
+        return self._factory
 
     def startup(self) -> None:
         print("Executing app-specific startup logic..")
 
     def run(self) -> None:
         print("Application running...")
-
-        print("User Interface %r is loaded." % self.settings.interface.type)
 
     def exit(self) -> None:
         print("Executing app-specific exit logic..")
