@@ -7,3 +7,10 @@ __pycache__/
 
 # VS Code
 .vscode/
+
+.env
+
+.mypy_cache
+.pytest_cache
+
+egg-info/
