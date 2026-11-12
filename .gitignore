@@ -13,4 +13,4 @@ __pycache__/
 .mypy_cache
 .pytest_cache
 
-bank_system.egg-info/
+*.egg-info/
