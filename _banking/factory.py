@@ -5,26 +5,28 @@ from _banking.config import get_settings
 if TYPE_CHECKING:
     from _banking.config import Settings
 
+
 class BackendProto(Protocol):
     backend: str
 
-BackendNameT: TypeAlias = str
+
 BackendT = TypeVar("BackendT", bound=BackendProto)
 
 AppBackendT = TypeVar("AppBackendT", bound=None)
 StorageBackendT = TypeVar("StorageBackendT", bound=None)
 
 
-_APP_BACKENDS: dict[str, AppBackendT] = {} # noqa
+_APP_BACKENDS: dict[str, AppBackendT] = {}  # noqa
 
-_STORAGE_BACKENDS: dict[str, StorageBackendT] = {} # noqa
+_STORAGE_BACKENDS: dict[str, StorageBackendT] = {}  # noqa
 
 
-def _read_from_config(settings: Settings, attname: str) -> BackendNameT:
+def _read_from_config(settings: Settings, attname: str) -> str:
     if not hasattr(settings, attname):
         raise TypeError("Invalid settings, does not have attr: %r" % attname)
 
     return getattr(settings, attname).backend
+
 
 class Factory:
     def __init__(self, settings: Settings) -> None:
@@ -53,14 +55,14 @@ class Factory:
         return _STORAGE_BACKENDS[storage]
 
 
-FactoryT = TypeVar("FactoryT", bound=Factory)
-
 ##################################################################
 # PUBLIC API
 ##################################################################
 
-def get_factory() -> FactoryT:
+
+def get_factory() -> Factory:
     return Factory(settings=get_settings())
+
 
 """
 Let's say we are within the App.
