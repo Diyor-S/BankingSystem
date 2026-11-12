@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from _banking.core.client import Client
+from banking.core.client import Client
+
 from .storage.base import SelectionMode
-from .storage.inmemory import EntityNotFound , InMemoryStorage
+from .storage.inmemory import EntityNotFound, InMemoryStorage
 
 if TYPE_CHECKING:
-    from typing import Any, TypeAlias
     from collections.abc import Sequence
+    from typing import Any, TypeAlias
 
     from .storage.base import Storage
 
@@ -48,7 +49,7 @@ class ClientRepository:
         self,
         number: int,
         order_by: tuple[str, ...] = (),
-        which: SelectionMode = SelectionMode.FIRST
+        which: SelectionMode = SelectionMode.FIRST,
     ):
         return self.clients.get_many(number, order_by=order_by, which=which)
 

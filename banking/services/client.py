@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from _banking.repositories import ClientRepository
+from banking.repositories import ClientRepository
 
 if TYPE_CHECKING:
-    from _banking.core.client import Client
+    from banking.core.client import Client
+
 
 class ClientService:
     def __init__(self, client_repository: ClientRepository | None = None) -> None:

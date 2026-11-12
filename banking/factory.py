@@ -1,9 +1,11 @@
-from typing import TYPE_CHECKING, TypeVar, Protocol, TypeAlias
+from __future__ import annotations
 
-from _banking.config import get_settings
+from typing import TYPE_CHECKING, Protocol, TypeVar
+
+from banking.config import get_settings
 
 if TYPE_CHECKING:
-    from _banking.config import Settings
+    from banking.config import Settings
 
 
 class BackendProto(Protocol):
@@ -16,9 +18,9 @@ AppBackendT = TypeVar("AppBackendT", bound=None)
 StorageBackendT = TypeVar("StorageBackendT", bound=None)
 
 
-_APP_BACKENDS: dict[str, AppBackendT] = {}  # noqa
+_APP_BACKENDS: dict[str, AppBackendT] = {}
 
-_STORAGE_BACKENDS: dict[str, StorageBackendT] = {}  # noqa
+_STORAGE_BACKENDS: dict[str, StorageBackendT] = {}
 
 
 def _read_from_config(settings: Settings, attname: str) -> str:

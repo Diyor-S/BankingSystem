@@ -6,13 +6,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from _banking.config import get_settings
-from _banking.factory import get_factory
-from _banking.services import ClientService
+from banking.config import get_settings
+from banking.factory import get_factory
+from banking.services import ClientService
 
 if TYPE_CHECKING:
-    from _banking.config import Settings
-    from _banking.factory import Factory
+    from banking.config import Settings
+    from banking.factory import Factory
 
 
 class App:
