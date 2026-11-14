@@ -38,7 +38,11 @@ class Cli:
                 if message == "1":
                     client = self.app.create_client()
 
+                    all_clients = self.app.client_service.get_all()
+
                     print("Welcome client: %r" % client.name)
+
+                    print("These are all clients that we have got already: %s" % all_clients)
 
                 print("Your message: %r" % message)
         except KeyboardInterrupt:
