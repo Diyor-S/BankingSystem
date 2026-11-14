@@ -99,3 +99,57 @@ However, if the App has to manage all of that, it is gonna be a bit overloaded c
 there are still issues with the approach of having dict of Entities all available ones, tho it might seem to be
 good because we are reducing the code, but that also means that if there are specific methods to the Entity being applied
 in that case, even services can not solve that? Or maybe having Service is gonna overturn the table?
+
+14.11.2026 notes:
+
+This concerns the entity, service, storage, and repo initialization process:
+
+COMPONENTS = (
+    (ClientService, ClientRepository, Client),
+    (AccountService, AccountRepository, Account)
+)
+
+We are going to store three components into one thing. And then gonna iterate over this,
+and then since we are getting the storage, and app: cli or web from the config.
+
+And we are going to be able to inject those things together properly.
+
+Now the overall architecture:
+
+Domain Entities:
+- Client
+- Card
+- Account
+- Bank
+
+Storages:
+- InMemory
+- Database
+- File
+
+Repositories:
+- ClientRepository
+- CardRepository
+- AccountRepository
+- No need for bank, we need to consider this Bank as well.
+
+Services:
+- ClientService
+- CardService
+- AccountService
+- No need for bank, we need to consider this part as well.
+
+Bank domain class would be gathering all the other domain entities.
+
+App:
+App would be performing application-specific login, running etc things.
+And especially storing the reference to the bank.
+
+Adapters:
+- Cli
+- Web
+
+Cli or Web adapters would be decided based on .env file within the configuration
+and then they would store the reference to the App instance.
+
+That way we are able to actually gather all the components from the ground-up.
