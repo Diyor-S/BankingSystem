@@ -9,26 +9,35 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_BACKENDS = ("cli", "web", "gui")
-STORAGE_BACKENDS = ("inmemory", "file", "database")
+APP_BACKENDS = {
+    "cli": "banking.adapters.cli.Cli",
+    "web": "banking.adapters.web.Web",
+    "gui": "banking.adapters.gui.Gui"
+}
+
+STORAGE_BACKENDS = {
+    "inmemory": "banking.repositories.storage.inmemory.InMemoryStorage",
+    "database": "banking.repositories.storage.database.DatabaseStorage",
+    "file": "banking.repositories.storage.database.FileStorage",
+}
 
 class AppNotSupported(Exception): ...
 class StorageNotSupported(Exception): ...
 
 
 class ApplicationConfig:
-    def __init__(self, backend_name: str) -> None:
-        self.backend = backend_name
+    def __init__(self, backend_module: str) -> None:
+        self.backend = backend_module
 
 class StorageConfig:
-    def __init__(self, backend_name: str):
-        self.backend = backend_name
+    def __init__(self, backend_module: str):
+        self.backend = backend_module
 
 
 class Settings:
     def __init__(self):
-        self.app = ApplicationConfig(backend_name=get_app())
-        self.storage = StorageConfig(backend_name=get_storage())
+        self.app = ApplicationConfig(backend_module=get_app())
+        self.storage = StorageConfig(backend_module=get_storage())
 
 
 def get_app() -> str:
@@ -37,7 +46,7 @@ def get_app() -> str:
     if backend not in APP_BACKENDS:
         raise AppNotSupported("App type: %r is not supported!" % backend)
 
-    return backend
+    return APP_BACKENDS[backend]
 
 def get_storage() -> str :
     backend = os.getenv("STORAGE") or "database"
@@ -45,7 +54,7 @@ def get_storage() -> str :
     if backend not in STORAGE_BACKENDS:
         raise StorageNotSupported("Storage type: %r is not supported!" % backend)
 
-    return backend
+    return STORAGE_BACKENDS[backend]
 
 
 @cache
