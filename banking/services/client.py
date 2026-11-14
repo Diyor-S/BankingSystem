@@ -21,3 +21,6 @@ class ClientService:
         )
 
         return client
+
+    def get_all(self) -> list[Client]:
+        return list(self.client_repository.all())
